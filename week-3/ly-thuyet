@@ -1,0 +1,105 @@
+## 1. Khái niệm Authentication và Authorization
+
+### 1.1. Authentication (Xác thực)
+
+Authentication là quá trình xác minh danh tính người dùng để xác định người dùng có hợp lệ hay không. Quá trình này thường được thực hiện khi người dùng đăng nhập vào hệ thống.
+
+### 1.2. Authorization (Phân quyền)
+
+Authorization là quá trình kiểm tra quyền của người dùng đối với các chức năng và tài nguyên trong hệ thống. Việc phân quyền giúp bảo đảm người dùng chỉ được thực hiện những hành động mà họ được phép.
+
+### 1.3. Phân biệt Authentication và Authorization
+
+Authentication tập trung vào việc xác minh danh tính người dùng - "bạn là ai?", trong khi Authorization tập trung vào việc kiểm tra quyền truy cập - "bạn được làm gì". Hai cơ chế này phối hợp với nhau để bảo vệ hệ thống.
+
+## 2. Session-based và Token-based Authentication
+
+### 2.1. Session-based Authentication
+
+Session-based Authentication là cơ chế xác thực sử dụng session để duy trì trạng thái đăng nhập. Sau khi đăng nhập thành công, server tạo session và gửi session ID cho client thông qua cookie. Trong các request tiếp theo, client gửi cookie để server xác định người dùng.
+
+Session thường được lưu ở phía server hoặc trong hệ thống lưu trữ như Redis. Cơ chế này giúp server dễ quản lý và thu hồi phiên đăng nhập, nhưng cần quản lý dữ liệu session.
+
+### 2.2. Token-based Authentication
+
+Token-based Authentication là cơ chế xác thực sử dụng token để xác minh người dùng khi truy cập hệ thống. Sau khi đăng nhập thành công, server cấp token cho client. Client gửi token trong các request cần xác thực.
+
+Với JWT, server có thể xác minh token mà không cần lưu session cho mỗi request. Tuy nhiên, hệ thống vẫn có thể cần lưu trạng thái để quản lý refresh token hoặc thu hồi token.
+
+### 2.3. So sánh và lựa chọn
+
+Session-based phù hợp với nhiều ứng dụng web sử dụng cookie và cần quản lý trạng thái đăng nhập tập trung. Token-based phù hợp với các hệ thống cung cấp API cho nhiều loại client.
+
+Việc lựa chọn phụ thuộc vào kiến trúc hệ thống, yêu cầu bảo mật và cách quản lý trạng thái đăng nhập.
+
+## 3. JWT (JSON Web Token)
+
+### 3.1. Khái niệm
+
+JWT là một định dạng token được sử dụng để truyền thông tin giữa các bên. JWT thường được sử dụng trong hệ thống xác thực và phân quyền người dùng.
+
+### 3.2. Cấu trúc JWT
+
+JWT gồm ba thành phần chính: Header, Payload và Signature.
+
+Header chứa thông tin về loại token và thuật toán ký.
+
+Payload chứa các thông tin cần thiết được gọi là claims, chẳng hạn danh tính người dùng và thời hạn token.
+
+Signature là chữ ký được tạo từ Header, Payload và khóa ký. Chữ ký giúp server kiểm tra tính toàn vẹn của token.
+
+Payload mặc định không được mã hóa bí mật, vì vậy không nên lưu thông tin nhạy cảm trong phần này.
+
+### 3.3. Lợi ích của JWT
+
+JWT hỗ trợ xác thực người dùng, phù hợp với các hệ thống REST API và cho phép server xác minh token mà không cần lưu session cho mỗi request. JWT cũng hỗ trợ xác định thời hạn sử dụng của token.
+
+### 3.4. Hạn chế và rủi ro bảo mật
+
+JWT có thể bị lợi dụng nếu token bị đánh cắp. Việc thu hồi token trước thời hạn cũng phức tạp nếu không có cơ chế bổ sung. Ngoài ra, cấu hình xác minh sai hoặc quản lý khóa không an toàn có thể gây ra lỗ hổng bảo mật.
+
+Để giảm rủi ro, cần sử dụng HTTPS, bảo vệ khóa ký, đặt thời hạn token phù hợp và xác minh chữ ký trước khi chấp nhận token.
+
+## 4. Password Hashing
+
+### 4.1. Khái niệm
+
+Password Hashing là quá trình chuyển mật khẩu thành giá trị băm để lưu trữ an toàn hơn. Khi người dùng đăng nhập, hệ thống xác minh mật khẩu được cung cấp với giá trị băm đã lưu.
+
+### 4.2. Vì sao không lưu mật khẩu dạng plain text?
+
+Lưu mật khẩu dạng plain text khiến mật khẩu có thể bị đọc trực tiếp nếu cơ sở dữ liệu bị lộ. Vì vậy, hệ thống cần băm mật khẩu trước khi lưu trữ.
+
+### 4.3. Vì sao không nên dùng MD5 hoặc SHA trực tiếp?
+
+MD5 và SHA-256 là các hàm băm nhanh, không được thiết kế chuyên biệt để lưu mật khẩu. Kẻ tấn công có thể thử nhiều mật khẩu trong thời gian ngắn nếu lấy được dữ liệu băm.
+
+Do đó, nên sử dụng các thuật toán băm mật khẩu chuyên dụng như BCrypt hoặc Argon2.
+
+### 4.4. Salt và Cost Factor
+
+Salt là giá trị ngẫu nhiên được tạo riêng cho mỗi mật khẩu nhằm tăng độ an toàn và hạn chế hiệu quả của các phương pháp tra cứu mật khẩu phổ biến.
+
+Cost Factor là tham số điều chỉnh mức độ tốn tài nguyên khi băm mật khẩu. Cost phù hợp giúp làm chậm quá trình thử mật khẩu hàng loạt.
+
+BCrypt và Argon2 là các thuật toán thường được sử dụng để bảo vệ mật khẩu. Nên sử dụng thư viện bảo mật đáng tin cậy để thực hiện quá trình băm và xác minh.
+
+## 5. Thực hành xác thực và phân quyền
+
+### 5.1. Đăng ký và đăng nhập
+
+Hệ thống cần cung cấp chức năng đăng ký và đăng nhập. Khi đăng ký, mật khẩu phải được băm trước khi lưu vào cơ sở dữ liệu. Khi đăng nhập, hệ thống xác minh thông tin người dùng và cấp access token nếu hợp lệ.
+
+### 5.2. Kiểm tra JWT
+
+JWT Filter có nhiệm vụ đọc token từ request, xác minh tính hợp lệ và thiết lập thông tin xác thực cho Spring Security. Những request có token không hợp lệ hoặc đã hết hạn sẽ bị từ chối khi truy cập tài nguyên được bảo vệ.
+
+### 5.3. Phân quyền người dùng
+
+Hệ thống sử dụng role để xác định quyền truy cập của người dùng. Các chức năng được bảo vệ phải kiểm tra quyền trước khi cho phép thực hiện. Việc xác định role phải dựa trên dữ liệu đáng tin cậy từ server.
+
+### 5.4. Refresh Token
+
+Refresh Token được sử dụng để cấp access token mới khi access token hết hạn, giúp người dùng không phải đăng nhập lại thường xuyên.
+
+Refresh token cần được bảo vệ, có thời hạn sử dụng và hỗ trợ thu hồi khi cần thiết. Hệ thống có thể sử dụng cơ chế thay thế refresh token sau mỗi lần làm mới để tăng tính an toàn.
