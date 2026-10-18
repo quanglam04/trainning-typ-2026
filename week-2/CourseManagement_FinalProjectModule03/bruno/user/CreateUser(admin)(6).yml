@@ -1,0 +1,32 @@
+info:
+  name: CreateUser(admin)(6)
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/users"
+  body:
+    type: json
+    data: "{\r
+
+      \    \"username\":\"student_4\",\r
+
+      \    \"email\":\"{{email}}\",\r
+
+      \    \"fullName\": \"Demo Student\",\r
+
+      \    \"password\":\"{{password}}\",\r
+
+      \    \"role\":\"STUDENT\"\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,27 @@
+info:
+  name: "04 - Update Course (PUT)"
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/courses/{{courseId}}"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Week 2 Bruno Demo Course - Updated by PUT",
+        "description": "All editable fields included in this PUT example.",
+        "teacherId": {{teacherId}},
+        "price": 0,
+        "durationHours": 3
+      }
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

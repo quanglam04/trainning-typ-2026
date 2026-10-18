@@ -1,0 +1,18 @@
+info:
+  name: "14 - Refresh after logout (401)"
+  type: http
+  seq: 14
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/refresh"
+  body:
+    type: json
+    data: "{\"refreshToken\":\"{{refreshToken}}\"}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 20000
+  followRedirects: true
+  maxRedirects: 5

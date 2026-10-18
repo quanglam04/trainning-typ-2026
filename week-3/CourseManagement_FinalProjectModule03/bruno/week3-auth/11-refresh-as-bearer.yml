@@ -1,0 +1,17 @@
+info:
+  name: "11 - REFRESH cannot access API (401)"
+  type: http
+  seq: 11
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/auth/me"
+  auth:
+    type: bearer
+    token: "{{refreshToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 20000
+  followRedirects: true
+  maxRedirects: 5

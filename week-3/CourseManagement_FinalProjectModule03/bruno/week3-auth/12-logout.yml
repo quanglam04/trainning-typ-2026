@@ -1,0 +1,20 @@
+info:
+  name: "12 - Logout both tokens (200)"
+  type: http
+  seq: 12
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/logout"
+  body:
+    type: json
+    data: "{\"refreshToken\":\"{{refreshToken}}\"}"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 20000
+  followRedirects: true
+  maxRedirects: 5

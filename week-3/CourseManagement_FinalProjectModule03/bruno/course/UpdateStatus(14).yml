@@ -1,0 +1,20 @@
+info:
+  name: UpdateStatus(14)
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/courses/{{courseId}}/status"
+  body:
+    type: json
+    data: "{\r\n    \"status\": \"DELET\"\r\n}"
+  auth:
+    type: bearer
+    token: "{{teacherToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
