@@ -1,0 +1,14 @@
+{
+  "name": "week-4-message-queue",
+  "version": "1.0.0",
+  "description": "Week 4: RabbitMQ Asynchronous Email Worker",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "worker": "node src/workers/email.worker.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "express": "^4.19.2"
+  }
+}
