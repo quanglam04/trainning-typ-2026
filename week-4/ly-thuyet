@@ -1,0 +1,214 @@
+# Message Queue
+## Message Queue là gì?
+### Định nghĩa
+MQ là một thành phần trung gian nằm giữa các service. Bên gửi (producer) đẩy message vào hàng đợi, bên nhận (consumer) lấy ra xử lý sau. được sử dụng để truyền thông tin (thông điệp) giữa các thành phần của hệ thống mà không cần chúng tương tác trực tiếp với nhau.
+### Cách thức hoạt động
+- Bước 1: Producer tạo ra thông điệp cần truyền đi. Thông tin này có thể là dữ liệu hoặc các thông tin bổ sung. Thông tin này sẽ được truyền vào Mesage queue và được lưu trữ tạm thời tại đây.
+- Bước 2: Consumer sẽ lấy thông điệp của Producer thông qua Message queue. Thông tin thường được được lấy theo cơ chế FIFO (first in - first out), tuy nhiên vẫn có thể can thiệp vào cơ chế này bằng cách định ra các ưu tiên.
+- Bước 3: Sau khi Consumer lấy được thông tin sẽ tiếp tục xử lý và thực hiện các hành động tuỳ thuộc vào yêu cầu của hệ thống.
+## Sync vs Async communication
+### Sync (Đồng bộ)
+Sync: các công việc được thực hiện theo trình tự. Công việc tiếp theo thường phải chờ công việc trước hoàn thành
+
+### Async (Bất đồng bộ)
+Async: Chương trình có thể khởi chạy một tác vụ rồi tiếp tục làm công việc khác mà không cần chờ tác vụ đó hoàn thành ngay lập tức.
+
+### So sánh:
+# So sánh lập trình đồng bộ (Sync) và bất đồng bộ (Async)
+
+| Tiêu chí | Sync (Đồng bộ) | Async (Bất đồng bộ) |
+|---|---|---|
+| **Cách thực thi** | Các thao tác thường được thực hiện tuần tự; tác vụ sau chờ tác vụ trước hoàn thành. | Có thể tiếp tục công việc khác trong khi tác vụ trước vẫn đang xử lý. |
+| **Tính đơn giản** | Đơn giản, dễ đọc và dễ triển khai. | Phức tạp hơn do cần quản lý kết quả, trạng thái và lỗi của tác vụ. |
+| **Gỡ lỗi** | Thường dễ gỡ lỗi vì luồng thực thi rõ ràng, ít vấn đề về đồng thời hơn. | Có thể khó gỡ lỗi hơn do thứ tự hoàn thành của các tác vụ không cố định. |
+| **Tính dự đoán** | Dễ dự đoán thứ tự thực hiện các câu lệnh tuần tự. | Thời điểm và thứ tự hoàn thành các tác vụ có thể không xác định trước. |
+| **Khả năng phản hồi** | Có thể phản hồi chậm nếu phải chờ tác vụ lâu hoàn thành. | Có thể duy trì khả năng phản hồi tốt hơn khi tác vụ dài được xử lý bất đồng bộ. |
+
+
+## Tại sao cần MQ? 
+
+### Nếu thực hiện các theo tác tuần tự( syns):
+
+User -> tạo đơn -> gửi email -> cập nhật kho -> tạo log -> response
+
+- Nếu 1 trong các thao tác trên bị lỗi thì cả flow sẽ lỗi theo.
+- Các thao tác phải chờ nhau nên thời gian phải hồi sẽ chậm hơn so với việc sử dụng MQ
+
+### Thực hiện sử dung MQ( asyns):
+- User tạo đơn sẽ nhận được response, sau đó mới xử lý các thao tác.
+- Mỗi thao tác như: gửi email, cập nhật, tạo log thì sẽ có 1 queue chứa các message và thực hiện đồng thời.
+- Nếu có thao tác bị lỗi thì sẽ được dữ lại trong queue và sẽ chạy lại,không ảnh hưởng đến các queue còn lại.
+
+## Khi nào dùng MQ, khi nào gọi trực tiếp?
+ - Gọi trực tiếp Thích hợp cho các ứng dụng, tập lệnh hoặc tác vụ đơn giản, nơi các thao tác diễn ra nhanh chóng và không liên quan đến nhiều thao tác nhập/xuất dữ liệu hoặc thời gian chờ đợi lâu.
+
+- Dùng MQ khi tác vụ chậm hoặc không cần kết quả ngay (email, báo cáo, xử lý ảnh), một sự kiện cần thông báo cho nhiều bên, cần chịu tải đột biến, cần retry khi lỗi, hoặc cần tách service.
+
+# Các mô hình message queue 
+## Point to Point
+Message queue có thể là kiểu point-to-point, tức là khi đó ta chỉ có một hàng đợi và các consumer để xử lý các tin nhắn trong hàng đợi, một tin nhắn thì được xử lỷ bởi 1 consumer.
+
+VD: Hệ thống có 1.000 video cần xử lý. Bạn chạy 5 worker cùng nhận công việc từ một queue. Mỗi video được giao cho một worker xử lý, thay vì cả 5 worker cùng xử lý video đó.
+
+## Publish/Subscribe
+
+message queue có thể sử dụng định dạng Publisher-Subscriber, trong đó publisher (nhà sản xuất) gửi tin nhắn đến hàng đợi (trong trường hợp này được gọi là Topic) và tất cả subscriber (người đăng ký) vào cùng 1 Topic đều sẽ nhận được tin nhắn trong Topic đó.
+
+VD: Như bài toán user đặt hàng ở trên, User ấn đặt hàng thì, topic phân phối các message đến các queue tướng ứng( queue email, queue cn kho, queue log) cho các consumer tương ứng với các queue đó xử lý.
+
+### So sánh Point to Point và Publish/subscribe
+
+
+| Tiêu chí | Point-to-Point (P2P) | Publish/Subscribe (Pub/Sub) |
+|---|---|---|
+| **Mục đích** | Phân phối công việc cho các Consumer. | Phát thông báo sự kiện đến nhiều thành phần độc lập. |
+| **Mối quan hệ** | Một message thường được xử lý bởi một Consumer trong nhóm cùng đọc Queue. | Một sự kiện có thể được nhiều Subscriber nhận và xử lý độc lập. |
+| **Cách phân phối** | Các Consumer thường chia nhau xử lý message trong cùng Queue. | Mỗi Subscriber thường có Queue riêng hoặc Consumer Group riêng để nhận sự kiện. |
+| **Khả năng xử lý song song** | Có thể tăng số lượng Consumer để chia sẻ khối lượng công việc. | Nhiều Subscriber có thể xử lý cùng một sự kiện song song. |
+| **Ưu điểm** | Đơn giản, dễ quản lý công việc, phù hợp xử lý tác vụ nền. | Dễ mở rộng, nhiều dịch vụ có thể phản ứng với cùng một sự kiện độc lập. |
+| **Nhược điểm** | Các Consumer cùng Queue thường không nhận được bản sao của mọi message. | Cần quản lý nhiều Queue hoặc Subscriber; có thể phát sinh xử lý trùng hoặc lỗi đồng bộ dữ liệu. |
+| **Khi nào sử dụng?** | Khi mỗi công việc chỉ cần được một Consumer xử lý. | Khi một sự kiện cần được nhiều thành phần nhận và xử lý. |
+
+# RabbitMQ
+
+RabbitMQ là một message blocker nhận message từ producer, định tuyến message thông qua exchange, đưa message vào queue phù hợp và chuyển giao cho consumer xử lý.
+Trong đó:
+- Producer: Gửi message.
+- Consumer: Nhận và xử lý message. 
+- Exchange: thực hiện nhiêm vụ điều hướng message tù Producer đến queue.
+- Queue: là nơi chứa message.
+- Binding: Đảm nhận nhiệm vụ liên kết giữa Exchange và Queue.
+- Routing key: Một key mà Exchange dựa vào đó để quyết định cách để định tuyến message đến queue. Có thể hiểu nôm na, Routing key là địa chỉ dành cho message.
+
+# Thực hành
+
+## Cài đặt Queue và Exchange, tạo binding
+
+```java
+public class RabbitMQConfig {
+    //configuring the queue
+    @Bean
+    public Queue queue(){
+        return new Queue("queue");
+    }
+    //configuring the exchange
+    @Bean
+    public TopicExchange exchange(){
+        return new TopicExchange("exchange" );
+    }
+    //Creating the binding
+    @Bean
+    public Binding binding(){
+        return BindingBuilder
+                .bind(queue())
+                .to(exchange())
+                .with("routing_key");
+    }
+}
+```
+Producer
+```java
+@Service
+public class RabbitMQProducer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQProducer.class);
+    private RabbitTemplate rabbitTemplate;
+
+    public RabbitMQProducer(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
+
+    public void sendMessage(String message){
+        LOGGER.info(String.format("Message : %s", message));
+        rabbitTemplate.convertAndSend("exchange", "routing_key", message);
+
+    }
+}
+```
+Controller
+```java
+@RestController
+public class MessageController {
+
+    public static RabbitMQProducer rabbitMQProducer;
+
+    public MessageController(RabbitMQProducer rabbitMQProducer) {
+        this.rabbitMQProducer = rabbitMQProducer;
+    }
+
+    @GetMapping("/publish")
+    public ResponseEntity<String> sendMessage(@RequestParam("message") String message){
+        rabbitMQProducer.sendMessage(message);
+        return ResponseEntity.ok("Message sent to RabbitMQ");
+    }
+}
+
+```
+Khi API nhận request và đẩy message vào queue
+![alt text](screenshots/image-3.png)
+![alt text](screenshots/image-2.png)
+
+Comsumer
+```java
+@Service
+public class RabbitMQConsumer {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(RabbitMQConsumer.class);
+
+    @RabbitListener(queues = "queue")
+    public void consume(String message){
+        LOGGER.info(String.format("Received Message: %s", message));
+    }
+}
+```
+Khi thực hiện request 
+![alt text](screenshots/image-4.png)
+
+![alt text](screenshots/image-5.png)
+
+Consumer thực hiện xử lý các message trong queue làm queue rỗng.    
+
+![alt text](screenshots/image-6.png)
+
+## user đăng ký → gửi message → consumer gửi email welcome
+
+![alt text](screenshots/image-10.png)
+
+![alt text](screenshots/image-9.png)
+
+Gửi mail sau khi đăng kí thành công
+![alt text](screenshots/image-12.png)
+![alt text](screenshots/image-11.png)
+
+# 5. Các vấn đề cần chú ý khi dùng MQ
+
+### 1. Message bị gửi trùng (duplicate) → Idempotency
+
+Broker thường đảm bảo *at-least-once delivery*, nghĩa là một message có thể đến consumer nhiều lần (do retry, mất kết nối trước khi ack...). Vì vậy consumer cần xử lý **idempotent**: xử lý 1 lần hay nhiều lần đều cho cùng kết quả.
+
+- Gắn `message_id` hoặc idempotency key cho mỗi message
+- Lưu các ID đã xử lý (trong DB hoặc Redis) để bỏ qua bản trùng
+- Ví dụ: thanh toán đơn #123 chỉ được trừ tiền một lần dù nhận message hai lần
+
+### 2. Message bị mất → Acknowledge mechanism
+
+Consumer xác nhận (`ack`) đã xử lý xong thì broker mới xóa message khỏi queue.
+
+- Consumer chưa ack mà lỗi hoặc mất kết nối → broker giao lại message
+- Phía producer cũng có cơ chế tương tự: publisher confirms (RabbitMQ), `acks=all` (Kafka)
+- Bật persistence để message không mất khi broker restart
+
+### 3. Consumer chết giữa chừng → Dead Letter Queue (DLQ)
+
+DLQ chứa các message xử lý fail để retry hoặc điều tra sau.
+
+- **Consumer chết:** message chưa ack sẽ tự được giao lại cho consumer khác (nhờ cơ chế ack)
+- **Message gây lỗi liên tục** (dữ liệu sai, bug logic): sau N lần retry thất bại thì đẩy sang DLQ để không chặn queue chính
+- DLQ thường dùng để xử lý thủ công hoặc replay sau khi sửa lỗi, không nên tự động retry mãi
+
+### 4. Thứ tự message có quan trọng không? (ordering)
+
+Đảm bảo thứ tự làm giảm khả năng xử lý song song, nên cần cân nhắc xem có thật sự cần không.
+
+- Thường chỉ cần thứ tự **trong cùng một thực thể** (ví dụ cùng `order_id`), không cần thứ tự toàn cục
+- Kafka: dùng partition key để các message cùng key vào cùng partition
+- RabbitMQ: chỉ đảm bảo thứ tự khi mỗi queue có một consumer
