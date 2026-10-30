@@ -1,39 +1,21 @@
-# Tuần 4: Message Queue
-
----
+# Tuần 4: Message Queue (RabbitMQ)
 
 ## 1. Tìm hiểu Message Queue
-- Message Queue là gì?
-- Tại sao cần MQ? Bài toán: user đặt hàng xong cần gửi email + cập nhật kho + ghi log — nếu gọi tuần tự thì chậm, 1 cái fail thì cả flow fail
-- Sync vs Async communication
-- Khi nào dùng MQ, khi nào gọi trực tiếp?
+- **Message Queue là gì:** Thành phần trung gian lưu trữ thông điệp (messages) giữa Producer và Consumer, cho phép các tiến trình trao đổi dữ liệu bất đồng bộ.
+- **Tại sao cần MQ:** Tránh rủi ro nghẽn I/O khi thực hiện các tác vụ nặng (gửi email, xử lý hình ảnh, xuất báo cáo). Người dùng nhận phản hồi ngay lập tức (<50ms) thay vì phải đợi 2-3 giây. Đảm bảo tính độc lập và chịu lỗi (fault tolerance).
+- **Mô hình sử dụng:** Point-to-Point (Queue) với RabbitMQ, mỗi tin nhắn được xử lý bởi một worker duy nhất.
 
-## 2. Các mô hình Message Queue
-- Point-to-Point (Queue): 1 producer → 1 consumer xử lý
-- Publish/Subscribe (Topic): 1 producer → nhiều consumer cùng nhận
-- So sánh: khi nào dùng mô hình nào?
+## 2. Kiến trúc RabbitMQ trong Project
+- **Producer:** API Server (`/api/auth/register`) tiếp nhận request và đẩy event vào RabbitMQ.
+- **Queue:** `user_welcome_email` (durable: true, persistent: true).
+- **Consumer:** Worker độc lập (`email.worker.js`) lấy tin nhắn từ queue, giả lập gửi email và gửi `ack` xác nhận.
 
-## 3. Chọn 1 Message Queue & tìm hiểu kiến trúc
-- Gợi ý: RabbitMQ (dễ bắt đầu) hoặc Kafka (phổ biến trong production)
-- Các khái niệm chính: Producer, Consumer, Queue/Topic, Exchange (RabbitMQ) hoặc Partition (Kafka)
-- Cài đặt bằng Docker
+## 3. Các vấn đề cần lưu ý
+- **Idempotency:** Kiểm tra ID của message để tránh xử lý trùng lặp khi mạng bị gián đoạn.
+- **Acknowledge Mechanism:** Sử dụng `noAck: false`, chỉ xác nhận xóa tin nhắn khỏi hàng đợi sau khi xử lý thành công.
+- **Dead Letter Queue (DLQ):** Lưu trữ các tin nhắn bị lỗi sau nhiều lần retry để kiểm tra thủ công.
 
-## 4. Implement — Phát triển từ project tuần 2-3
-- Use case gợi ý:
-  - User đặt hàng → gửi message vào queue → consumer gửi email xác nhận
-  - Hoặc: user đăng ký → gửi message → consumer gửi email welcome
-- Flow: API nhận request → xử lý logic chính → đẩy message vào queue → trả response cho user ngay (không chờ email gửi xong)
-
-## 5. Các vấn đề cần chú ý khi dùng MQ
-- Message bị gửi trùng (duplicate) → Idempotency: xử lý 1 lần hay nhiều lần đều cho cùng kết quả
-- Message bị mất → Acknowledge mechanism: consumer xác nhận đã xử lý xong
-- Consumer chết giữa chừng → Dead Letter Queue: chứa message xử lý fail để retry sau
-- Thứ tự message có quan trọng không? (ordering)
-
----
-
-## Output
-
-- Trình bày lý thuyết: MQ là gì, tại sao dùng, mô hình nào, kiến trúc MQ đã chọn
-- Demo: gọi API → message vào queue → consumer xử lý → kết quả
-- Giải thích được: nếu không dùng MQ thì flow này sẽ có vấn đề gì?
+## 4. Hướng dẫn chạy thử
+1. Khởi động RabbitMQ:
+   ```bash
+   docker compose up -d

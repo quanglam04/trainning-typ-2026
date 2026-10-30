@@ -1,0 +1,12 @@
+node_modules/
+redis_data/
+.env
+*.log
+.cursor/
+.cursorrules
+.copilot/
+.claude/
+.gemini/
+.aider*
+.vscode/
+.idea/

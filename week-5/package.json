@@ -1,0 +1,13 @@
+{
+  "name": "week-5-redis-caching",
+  "version": "1.0.0",
+  "description": "Demo Caching & Redis cho Week 5",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "redis": "^4.7.0"
+  }
+}
