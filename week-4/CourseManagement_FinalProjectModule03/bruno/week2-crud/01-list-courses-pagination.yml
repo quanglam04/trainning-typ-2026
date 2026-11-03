@@ -1,0 +1,17 @@
+info:
+  name: "01 - List Courses (Pagination)"
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/courses?page={{page}}&size={{size}}&search={{keyword}}"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

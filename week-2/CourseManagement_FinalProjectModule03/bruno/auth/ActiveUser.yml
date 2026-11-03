@@ -1,0 +1,24 @@
+info:
+  name: ActiveUser
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/active"
+  body:
+    type: json
+    data: "{\r
+
+      \    \"otp\":\"{{otp}}\",\r
+
+      \    \"email\":\"{{email}}\"\r
+
+      }"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

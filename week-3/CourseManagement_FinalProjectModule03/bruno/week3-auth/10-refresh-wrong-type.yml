@@ -1,0 +1,18 @@
+info:
+  name: "10 - ACCESS cannot refresh (401)"
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/refresh"
+  body:
+    type: json
+    data: "{\"refreshToken\":\"{{adminToken}}\"}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 20000
+  followRedirects: true
+  maxRedirects: 5

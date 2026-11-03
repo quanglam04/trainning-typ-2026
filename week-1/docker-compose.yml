@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: week1-postgres
+    environment:
+      POSTGRES_DB: week1_library
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - week1_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  week1_postgres_data:

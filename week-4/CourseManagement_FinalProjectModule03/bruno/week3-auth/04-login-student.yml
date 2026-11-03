@@ -1,0 +1,18 @@
+info:
+  name: "04 - Login STUDENT"
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/login"
+  body:
+    type: json
+    data: "{\"username\":\"student_pro\",\"password\":\"{{password}}\"}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 20000
+  followRedirects: true
+  maxRedirects: 5

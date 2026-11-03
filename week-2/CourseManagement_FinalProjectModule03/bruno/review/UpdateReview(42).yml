@@ -1,0 +1,24 @@
+info:
+  name: UpdateReview(42)
+  type: http
+  seq: 3
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/reviews/1"
+  body:
+    type: json
+    data: "{\r
+
+      \    \"rating\":1\r
+
+      \    \"comment\":\"\"\r
+
+      }"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,17 @@
+info:
+  name: 06 - DRAFT Must Not Be Cached
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/courses/{{draftCourseId}}"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 20000
+  followRedirects: true
+  maxRedirects: 5

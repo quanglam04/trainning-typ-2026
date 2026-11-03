@@ -1,0 +1,32 @@
+info:
+  name: PostCourse(12)
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/courses"
+  body:
+    type: json
+    data: "{\r
+
+      \    \"title\":\"Nhap mon tri tue nhan tao\",\r
+
+      \    \"description\":\"Mon nay introduce ve Ai co ban\",\r
+
+      \    \"teacherId\":{{teacherId}},\r
+
+      \    \"price\":10.0,\r
+
+      \    \"durationHours\":10\r
+
+      }"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

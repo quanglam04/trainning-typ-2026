@@ -1,0 +1,118 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: course_management_week5_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-final_project_03}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "127.0.0.1:${WEEK5_POSTGRES_PORT:-5437}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-final_project_03}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app_network
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: course_management_week5_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-mq_demo}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-mq_demo_password}
+    ports:
+      - "127.0.0.1:${WEEK5_RABBIT_PORT:-5673}:5672"
+      - "127.0.0.1:${WEEK5_RABBIT_UI_PORT:-15673}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - app_network
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: course_management_week5_redis
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:${WEEK5_REDIS_PORT:-6381}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - app_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: course_management_week5_app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${WEEK5_APP_PORT:-8085}:8080"
+    environment:
+      # Database connection inside Docker network using the postgres service hostname
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-final_project_03}
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+      # RabbitMQ inside Compose network
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-mq_demo}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-mq_demo_password}
+      MQ_PUBLISHER_ENABLED: ${MQ_PUBLISHER_ENABLED:-true}
+
+      # Redis cache
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      # JWT Security Configuration
+      JWT_SECRET: ${JWT_SECRET}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-false}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-300000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+
+      # Email (Gmail SMTP) configuration
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-your_email@gmail.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-your_app_password}
+
+      # Cloudinary configuration
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-demo_cloud}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-demo_key}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-demo_secret}
+    networks:
+      - app_network
+
+volumes:
+  rabbitmq_data:
+    name: course_management_week5_rabbitmq_data
+  postgres_data:
+    name: course_management_week5_postgres_data
+
+networks:
+  app_network:
+    name: course_management_week5_network
+    driver: bridge

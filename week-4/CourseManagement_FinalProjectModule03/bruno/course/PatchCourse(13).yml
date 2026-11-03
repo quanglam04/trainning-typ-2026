@@ -1,0 +1,20 @@
+info:
+  name: PatchCourse(13)
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/api/courses/{{courseId}}"
+  body:
+    type: json
+    data: "{\r\n    \"teacherId\":{{teacherId}}\r\n}"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

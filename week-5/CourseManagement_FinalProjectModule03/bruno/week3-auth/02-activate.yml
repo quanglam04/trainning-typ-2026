@@ -1,0 +1,18 @@
+info:
+  name: "02 - Activate (OTP from email)"
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/active"
+  body:
+    type: json
+    data: "{\"email\":\"{{demoEmail}}\",\"otp\":\"{{otp}}\"}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 20000
+  followRedirects: true
+  maxRedirects: 5

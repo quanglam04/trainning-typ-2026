@@ -1,0 +1,34 @@
+name: Local Example
+variables:
+  - name: baseUrl
+    value: http://localhost:8080
+  - name: username
+    value: admin
+  - name: password
+    value: "123456"
+  - name: email
+    value: student@example.com
+  - name: otp
+    value: REPLACE_WITH_OTP_FROM_EMAIL
+  - name: newPassword
+    value: REPLACE_WITH_NEW_PASSWORD
+  - name: refreshToken
+    value: REPLACE_WITH_REFRESH_TOKEN
+  - name: adminToken
+    value: REPLACE_WITH_ADMIN_ACCESS_TOKEN
+  - name: studentToken
+    value: REPLACE_WITH_STUDENT_ACCESS_TOKEN
+  - name: teacherToken
+    value: REPLACE_WITH_TEACHER_ACCESS_TOKEN
+  - name: accessToken
+    value: REPLACE_WITH_ACCESS_TOKEN
+  - name: teacherId
+    value: "3"
+  - name: courseId
+    value: REPLACE_WITH_CREATED_COURSE_ID
+  - name: page
+    value: "0"
+  - name: size
+    value: "5"
+  - name: keyword
+    value: ""

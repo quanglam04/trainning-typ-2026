@@ -1,0 +1,20 @@
+info:
+  name: 06 - Duplicate Enrollment (409)
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/enrollments"
+  body:
+    type: json
+    data: "{\"courseId\": {{mqCourseId}}}"
+  auth:
+    type: bearer
+    token: "{{studentToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 30000
+  followRedirects: true
+  maxRedirects: 5

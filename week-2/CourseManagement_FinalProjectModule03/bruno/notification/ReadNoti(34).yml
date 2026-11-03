@@ -1,0 +1,17 @@
+info:
+  name: ReadNoti(34)
+  type: http
+  seq: 2
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/notifications/1/read"
+  auth:
+    type: bearer
+    token: "{{studentToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

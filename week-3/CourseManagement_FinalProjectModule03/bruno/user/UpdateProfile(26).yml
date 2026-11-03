@@ -1,0 +1,20 @@
+info:
+  name: UpdateProfile(26)
+  type: http
+  seq: 7
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/users/4"
+  body:
+    type: json
+    data: "{\r\n}"
+  auth:
+    type: bearer
+    token: "{{studentToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

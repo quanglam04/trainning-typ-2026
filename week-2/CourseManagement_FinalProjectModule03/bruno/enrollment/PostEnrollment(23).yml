@@ -1,0 +1,20 @@
+info:
+  name: PostEnrollment(23)
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/enrollments"
+  body:
+    type: json
+    data: "{\r\n    \"courseId\": 3\r\n}"
+  auth:
+    type: bearer
+    token: "{{studentToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

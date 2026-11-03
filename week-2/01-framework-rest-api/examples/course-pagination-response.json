@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "status_code": 200,
+  "message": "Lấy danh sách khóa học thành công",
+  "data": {
+    "content": [
+      {
+        "courseId": 12,
+        "title": "Spring Boot căn bản",
+        "teacherId": 3,
+        "status": "PUBLISHED"
+      }
+    ],
+    "page": {
+      "size": 5,
+      "number": 0,
+      "totalElements": 12,
+      "totalPages": 3
+    }
+  },
+  "timestamp": "2026-10-13T08:00:00"
+}

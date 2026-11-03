@@ -1,0 +1,20 @@
+info:
+  name: DeleteUser(admin)(9)
+  type: http
+  seq: 6
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/users/4"
+  body:
+    type: text
+    data: ""
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

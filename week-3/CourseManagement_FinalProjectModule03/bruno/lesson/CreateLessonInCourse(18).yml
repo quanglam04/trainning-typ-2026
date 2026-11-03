@@ -1,0 +1,29 @@
+info:
+  name: CreateLessonInCourse(18)
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/courses/4/lessons"
+  body:
+    type: multipart-form
+    data:
+      - name: title
+        type: text
+        value: lesson1
+      - name: orderIndex
+        type: text
+        value: "2"
+      - name: textContent
+        type: text
+        value: hello
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
