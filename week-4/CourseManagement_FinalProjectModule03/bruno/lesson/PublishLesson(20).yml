@@ -1,0 +1,20 @@
+info:
+  name: PublishLesson(20)
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/lessons/5/publish"
+  body:
+    type: json
+    data: "{\r\n    \r\n}"
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

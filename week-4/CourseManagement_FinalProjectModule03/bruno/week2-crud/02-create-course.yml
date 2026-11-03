@@ -1,0 +1,27 @@
+info:
+  name: "02 - Create Course"
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/courses"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Week 2 Bruno Demo Course",
+        "description": "A course created to practice REST API and ORM in Week 2.",
+        "teacherId": {{teacherId}},
+        "price": 0,
+        "durationHours": 2
+      }
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

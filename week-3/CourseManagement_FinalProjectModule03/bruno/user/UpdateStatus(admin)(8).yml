@@ -1,0 +1,18 @@
+info:
+  name: UpdateStatus(admin)(8)
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/users/1/status"
+  body:
+    type: json
+    data: "{\r\n    \"isActive\":true\r\n}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

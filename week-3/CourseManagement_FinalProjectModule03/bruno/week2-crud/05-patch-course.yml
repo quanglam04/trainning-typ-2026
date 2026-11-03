@@ -1,0 +1,23 @@
+info:
+  name: "05 - Patch Course (partial update)"
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{baseUrl}}/api/courses/{{courseId}}"
+  body:
+    type: json
+    data: |-
+      {
+        "description": "Only this description field is changed by PATCH."
+      }
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,24 @@
+info:
+  name: UpdateLesson(19)
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/lessons/1"
+  body:
+    type: multipart-form
+    data:
+      - name: title
+        type: text
+        value: ""
+      - name: file
+        type: file
+        value: []
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

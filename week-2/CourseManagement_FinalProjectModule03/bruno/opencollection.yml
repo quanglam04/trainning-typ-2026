@@ -1,0 +1,10 @@
+opencollection: 1.0.0
+
+info:
+  name: Course Management - Week 2 Bruno
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

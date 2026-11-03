@@ -1,0 +1,27 @@
+info:
+  name: "06 - Validation Error (400)"
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/courses"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "",
+        "description": "This request is intentionally invalid.",
+        "teacherId": {{teacherId}},
+        "price": -1,
+        "durationHours": 1
+      }
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

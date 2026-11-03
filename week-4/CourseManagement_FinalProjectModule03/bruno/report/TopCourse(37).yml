@@ -1,0 +1,21 @@
+info:
+  name: TopCourse(37)
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/reports/top_courses?limit=1"
+  params:
+    - name: limit
+      value: "1"
+      type: query
+  auth:
+    type: bearer
+    token: "{{adminToken}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
