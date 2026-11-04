@@ -1,0 +1,11 @@
+# Local dependencies and generated output
+node_modules/
+.pnpm-store/
+dist/
+*.tsbuildinfo
+*.log
+
+# Local environment files
+.env
+.env.*
+!.env.example
