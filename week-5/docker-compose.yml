@@ -1,0 +1,41 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: courseshop-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: courseshop-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: courseshop
+      RABBITMQ_DEFAULT_PASS: courseshop_dev_password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: courseshop-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  redis_data:
+  rabbitmq_data:
+  
+#mô tả cấu hình để docker chạy đc rabbitMQ 

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CourseShop · Đăng nhập</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, "Segoe UI", Arial, sans-serif; color: #172033; background: #f3f6fb; }
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 28px; background: radial-gradient(circle at 15% 15%, #e1edff 0, transparent 32%), #f5f7fb; }
+    .layout { width: min(920px, 100%); min-height: 560px; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid #e4e9f2; border-radius: 24px; background: white; box-shadow: 0 24px 70px #243b6418; }
+    .brand { display: flex; flex-direction: column; justify-content: space-between; padding: 42px; color: white; background: linear-gradient(145deg, #142b55, #2467b2); }
+    .logo { font-size: 20px; font-weight: 750; letter-spacing: -.4px; }
+    .brand h1 { max-width: 360px; margin: 0 0 16px; font-size: 38px; line-height: 1.12; letter-spacing: -1.3px; }
+    .brand p { max-width: 350px; margin: 0; color: #d5e5ff; line-height: 1.7; }
+    .brand small { color: #c8dcff; }
+    .panel { display: flex; flex-direction: column; justify-content: center; padding: 48px; }
+    .tabs { display: flex; gap: 24px; margin-bottom: 30px; border-bottom: 1px solid #e9edf4; }
+    .tab { padding: 0 0 12px; border: 0; border-bottom: 2px solid transparent; background: none; color: #7b8495; font-size: 15px; font-weight: 650; cursor: pointer; }
+    .tab.active { border-color: #2869c7; color: #205cac; }
+    h2 { margin: 0 0 8px; font-size: 25px; letter-spacing: -.5px; }
+    .sub { margin: 0 0 25px; color: #788194; font-size: 14px; }
+    label { display: block; margin: 17px 0 7px; color: #3d4658; font-size: 13px; font-weight: 650; }
+    input { width: 100%; height: 46px; padding: 0 13px; border: 1px solid #dce2ec; border-radius: 9px; outline: none; font: inherit; }
+    input:focus { border-color: #4384dc; box-shadow: 0 0 0 3px #4384dc20; }
+    .primary, .secondary { width: 100%; min-height: 45px; margin-top: 22px; border: 0; border-radius: 9px; background: #2468c5; color: white; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .primary:hover { background: #1958ad; }
+    .secondary { margin-top: 10px; border: 1px solid #dce2ec; background: white; color: #36445a; }
+    .message { min-height: 20px; margin: 14px 0 0; color: #bf3447; font-size: 13px; line-height: 1.5; }
+    .message.ok { color: #16824e; }
+    .dashboard { display: none; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .actions button { min-height: 42px; border: 1px solid #dce2ec; border-radius: 8px; background: white; color: #33415a; cursor: pointer; }
+    pre { max-height: 150px; overflow: auto; padding: 12px; border-radius: 8px; background: #f4f6fa; color: #39445a; font-size: 12px; white-space: pre-wrap; }
+    @media (max-width: 700px) { body { padding: 14px; } .layout { grid-template-columns: 1fr; } .brand { min-height: 210px; padding: 25px; } .brand h1 { font-size: 28px; } .brand p, .brand small { display: none; } .panel { padding: 30px 25px; } }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <section class="brand">
+      <div class="logo">CourseShop</div>
+      <div>
+        <h1>Chào mừng bạn quay trở lại.</h1>
+        <p>Đăng nhập để tiếp tục sử dụng tài khoản và các API được bảo vệ của CourseShop.</p>
+      </div>
+      <small>Đăng nhập an toàn bằng access token</small>
+    </section>
+    <section class="panel">
+      <div id="authPanel">
+        <nav class="tabs" aria-label="Tài khoản">
+          <button class="tab active" id="loginTab" type="button">Đăng nhập</button>
+          <button class="tab" id="registerTab" type="button">Tạo tài khoản</button>
+        </nav>
+        <h2 id="formTitle">Đăng nhập</h2>
+        <p class="sub" id="formSubtitle">Nhập thông tin tài khoản của bạn.</p>
+        <form id="authForm">
+          <div id="nameField" hidden>
+            <label for="name">Tên hiển thị</label>
+            <input id="name" autocomplete="name" placeholder="Tên của bạn">
+          </div>
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required placeholder="ban@example.com">
+          <label for="password">Mật khẩu</label>
+          <input id="password" type="password" autocomplete="current-password" required placeholder="Nhập mật khẩu">
+          <button class="primary" id="submitButton" type="submit">Đăng nhập</button>
+        </form>
+        <p class="message" id="message" role="status"></p>
+      </div>
+      <div class="dashboard" id="dashboard">
+        <h2>Đăng nhập thành công</h2>
+        <p class="sub" id="welcome"></p>
+        <div class="actions">
+          <button id="meButton" type="button">Kiểm tra token</button>
+          <button id="todosButton" type="button">Gọi API Todos</button>
+          <button id="adminButton" type="button">Thử quyền Admin</button>
+          <button id="logoutButton" type="button">Đăng xuất</button>
+        </div>
+        <p class="message" id="apiMessage" role="status"></p>
+        <pre id="apiResult">Chọn một API để xem kết quả.</pre>
+      </div>
+    </section>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let registering = false;
+    const message = (text, ok = false) => { $('message').textContent = text; $('message').className = `message${ok ? ' ok' : ''}`; };
+    function setMode(register) {
+      registering = register;
+      $('loginTab').classList.toggle('active', !register);
+      $('registerTab').classList.toggle('active', register);
+      $('nameField').hidden = !register;
+      $('name').required = register;
+      $('formTitle').textContent = register ? 'Tạo tài khoản' : 'Đăng nhập';
+      $('formSubtitle').textContent = register ? 'Tài khoản mới sẽ được cấp quyền USER.' : 'Nhập thông tin tài khoản của bạn.';
+      $('submitButton').textContent = register ? 'Đăng ký' : 'Đăng nhập';
+      $('password').autocomplete = register ? 'new-password' : 'current-password';
+      message('');
+    }
+    $('loginTab').addEventListener('click', () => setMode(false));
+    $('registerTab').addEventListener('click', () => setMode(true));
+
+    $('authForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      message('Đang xử lý…');
+      const email = $('email').value.trim();
+      const password = $('password').value;
+      try {
+        if (registering) {
+          const response = await fetch('/users', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: $('name').value.trim(), email, password })
+          });
+          if (!response.ok) throw new Error(await errorText(response));
+        }
+        const response = await fetch('/auth/token/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: email, password })
+        });
+        if (!response.ok) throw new Error(await errorText(response));
+        const tokens = await response.json();
+        localStorage.setItem('courseShopAccessToken', tokens.accessToken);
+        localStorage.setItem('courseShopRefreshToken', tokens.refreshToken);
+        showDashboard(email);
+      } catch (error) { message(error.message || 'Không thể kết nối máy chủ.'); }
+    });
+
+    async function errorText(response) {
+      try { const data = await response.json(); return data.message || data.error || `Lỗi HTTP ${response.status}`; }
+      catch { return `Lỗi HTTP ${response.status}`; }
+    }
+    function showDashboard(email) {
+      $('authPanel').style.display = 'none';
+      $('dashboard').style.display = 'block';
+      $('welcome').textContent = `Bạn đã đăng nhập với ${email}.`;
+      $('apiMessage').textContent = '';
+    }
+    async function callApi(path) {
+      $('apiMessage').textContent = 'Đang gọi API…';
+      try {
+        const response = await fetch(path, { headers: { Authorization: `Bearer ${localStorage.getItem('courseShopAccessToken')}` } });
+        const text = response.status === 204 ? 'Đăng xuất thành công.' : await response.text();
+        $('apiResult').textContent = text;
+        $('apiMessage').textContent = `HTTP ${response.status}`;
+        $('apiMessage').className = `message${response.ok ? ' ok' : ''}`;
+        return response.ok;
+      } catch (error) { $('apiMessage').textContent = error.message; return false; }
+    }
+    $('meButton').addEventListener('click', () => callApi('/auth/token/me'));
+    $('todosButton').addEventListener('click', () => callApi('/todos?page=1&size=10'));
+    $('adminButton').addEventListener('click', () => callApi('/admin/users'));
+    $('logoutButton').addEventListener('click', async () => {
+      const refreshToken = localStorage.getItem('courseShopRefreshToken');
+      try { await fetch('/auth/token/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refreshToken }) }); }
+      finally {
+        localStorage.removeItem('courseShopAccessToken');
+        localStorage.removeItem('courseShopRefreshToken');
+        $('dashboard').style.display = 'none';
+        $('authPanel').style.display = 'block';
+        $('apiResult').textContent = 'Đã đăng xuất.';
+        message('Bạn đã đăng xuất.', true);
+      }
+    });
+    if (localStorage.getItem('courseShopAccessToken')) showDashboard('tài khoản hiện tại');
+  </script>
+</body>
+</html>
