@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Nhà Hàng - MTD Restaurant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
+
+    <!-- Top Navigation -->
+    <header class="bg-emerald-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-utensils text-2xl"></i>
+                <h1 class="text-xl font-bold tracking-wide">MTD Restaurant POS</h1>
+            </div>
+            <div id="user-info-bar" class="flex items-center space-x-4">
+                <!-- User tag or login button -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6">
+
+        <!-- LOGIN MODAL / VIEW (IF NOT LOGGED IN) -->
+        <div id="auth-section" class="max-w-md mx-auto mt-12 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+            <div class="text-center mb-6">
+                <div class="inline-flex p-3 bg-emerald-100 text-emerald-600 rounded-full mb-2">
+                    <i class="fa-solid fa-user-lock text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Đăng Nhập Hệ Thống</h2>
+                <p class="text-sm text-gray-500">Đăng nhập bằng tài khoản nhân viên (Admin / Waiter / Kitchen / Cashier)</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Email</label>
+                    <input type="email" id="login-email" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="waiter01@restaurant.com" value="waiter01@restaurant.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Mật khẩu</label>
+                    <input type="password" id="login-password" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="Nhập mật khẩu">
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow transition">
+                    Đăng Nhập
+                </button>
+            </form>
+        </div>
+
+        <!-- DASHBOARD WORKSPACE (WHEN LOGGED IN) -->
+        <div id="dashboard-section" class="hidden space-y-6">
+
+            <!-- Navigation Tabs -->
+            <div class="flex space-x-2 border-b border-gray-200">
+                <button onclick="switchTab('pos')" id="tab-btn-pos" class="px-5 py-2.5 font-bold text-sm border-b-2 border-emerald-600 text-emerald-600 flex items-center space-x-2">
+                    <i class="fa-solid fa-cart-plus"></i><span>1. Gọi Món (Waiter)</span>
+                </button>
+                <button onclick="switchTab('kitchen')" id="tab-btn-kitchen" class="px-5 py-2.5 font-bold text-sm text-gray-500 hover:text-emerald-600 flex items-center space-x-2">
+                    <i class="fa-solid fa-fire-burner"></i><span>2. Màn Hình Bếp (Kitchen)</span>
+                </button>
+                <button onclick="switchTab('cashier')" id="tab-btn-cashier" class="px-5 py-2.5 font-bold text-sm text-gray-500 hover:text-emerald-600 flex items-center space-x-2">
+                    <i class="fa-solid fa-cash-register"></i><span>3. Thu Ngân (Cashier)</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: POS - TẠO ORDER -->
+            <div id="tab-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Cột trái: Chọn Món & Bàn -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-lg mb-4 text-gray-700 flex items-center">
+                            <i class="fa-solid fa-chair text-emerald-600 mr-2"></i>Chọn Bàn Ăn
+                        </h3>
+                        <div id="table-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                            <!-- Tables loaded via JS -->
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-lg mb-4 text-gray-700 flex items-center">
+                            <i class="fa-solid fa-bowl-food text-emerald-600 mr-2"></i>Thực Đơn Món Ăn
+                        </h3>
+                        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <!-- Products loaded via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Chi tiết giỏ hàng Order -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex flex-col h-fit sticky top-20">
+                    <h3 class="font-bold text-lg mb-3 text-gray-700 border-b pb-2 flex justify-between items-center">
+                        <span>Đơn Hàng Hiện Tại</span>
+                        <span id="selected-table-badge" class="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-semibold">Chưa chọn bàn</span>
+                    </h3>
+
+                    <!-- Customer Email for Invoice -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Email nhận hóa đơn (Khách hàng):</label>
+                        <input type="email" id="order-customer-email" class="w-full text-sm px-3 py-1.5 border rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="khachhang@gmail.com" value="khachhang@gmail.com">
+                    </div>
+
+                    <!-- Selected Items List -->
+                    <div id="cart-items-list" class="flex-1 overflow-y-auto max-h-72 space-y-2 divide-y divide-gray-100">
+                        <p class="text-sm text-gray-400 text-center py-8">Chưa có món nào được chọn</p>
+                    </div>
+
+                    <div class="border-t pt-4 mt-4 space-y-2">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-500">Tổng tiền:</span>
+                            <span id="cart-total" class="text-xl font-bold text-emerald-600">0 đ</span>
+                        </div>
+                        <button onclick="submitCreateOrder()" id="btn-submit-order" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow transition flex justify-center items-center space-x-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Gửi Đơn Cho Bếp</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: MÀN HÌNH BẾP (KITCHEN DISPATCH) -->
+            <div id="tab-kitchen" class="hidden space-y-4">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
+                    <h3 class="font-bold text-lg text-gray-700"><i class="fa-solid fa-fire text-amber-500 mr-2"></i>Đơn Đang Chờ Bếp Chế Biến</h3>
+                    <button onclick="loadOrders()" class="text-sm text-emerald-600 hover:underline flex items-center">
+                        <i class="fa-solid fa-rotate-right mr-1"></i>Làm mới
+                    </button>
+                </div>
+                <div id="kitchen-orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Kitchen cards loaded via JS -->
+                </div>
+            </div>
+
+            <!-- TAB 3: THU NGÂN (CASHIER & PAYMENT) -->
+            <div id="tab-cashier" class="hidden space-y-4">
+                <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
+                    <h3 class="font-bold text-lg text-gray-700"><i class="fa-solid fa-receipt text-indigo-500 mr-2"></i>Hóa Đơn Cần Thanh Toán</h3>
+                    <button onclick="loadOrders()" class="text-sm text-emerald-600 hover:underline flex items-center">
+                        <i class="fa-solid fa-rotate-right mr-1"></i>Làm mới
+                    </button>
+                </div>
+                <div id="cashier-orders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Cashier cards loaded via JS -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform transition-all duration-300 translate-y-24 opacity-0 bg-gray-900 text-white px-5 py-3 rounded-lg shadow-xl flex items-center space-x-3">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+        <span id="toast-msg" class="text-sm">Thông báo</span>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        let currentUser = null;
+        let token = localStorage.getItem('token') || '';
+        let selectedTableId = null;
+        let cart = []; // [{ product, quantity }]
+        let allTables = [];
+        let allProducts = [];
+
+        // Check authentication on load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (token) {
+                const savedUser = localStorage.getItem('user');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    showDashboard();
+                } else {
+                    showAuth();
+                }
+            } else {
+                showAuth();
+            }
+        });
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = msg;
+            toast.className = `fixed bottom-5 right-5 z-50 transform transition-all duration-300 px-5 py-3 rounded-lg shadow-xl flex items-center space-x-3 ${isError ? 'bg-red-600 text-white' : 'bg-gray-900 text-white'}`;
+            toastIcon.className = isError ? 'fa-solid fa-triangle-exclamation text-xl text-white' : 'fa-solid fa-circle-check text-emerald-400 text-xl';
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
+
+        // Login Handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.message || data.details);
+
+                token = data.data.accessToken;
+                currentUser = data.data.user;
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(currentUser));
+
+                showToast(`Xin chào ${currentUser.full_name || currentUser.email} (${currentUser.role})!`);
+                showDashboard();
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        });
+
+        function logout() {
+            localStorage.clear();
+            token = '';
+            currentUser = null;
+            location.reload();
+        }
+
+        function showAuth() {
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('user-info-bar').innerHTML = '';
+        }
+
+        function showDashboard() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('user-info-bar').innerHTML = `
+                <div class="flex items-center space-x-3 text-sm">
+                    <span class="bg-emerald-700 px-3 py-1 rounded-full font-medium">
+                        <i class="fa-solid fa-id-badge mr-1"></i>${currentUser.role.toUpperCase()}: ${currentUser.full_name || currentUser.username}
+                    </span>
+                    <button onclick="logout()" class="text-white hover:text-red-200 text-xs underline">Đăng xuất</button>
+                </div>
+            `;
+            initData();
+        }
+
+        function switchTab(tab) {
+            ['pos', 'kitchen', 'cashier'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = "px-5 py-2.5 font-bold text-sm text-gray-500 hover:text-emerald-600 flex items-center space-x-2";
+            });
+
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tab}`).className = "px-5 py-2.5 font-bold text-sm border-b-2 border-emerald-600 text-emerald-600 flex items-center space-x-2";
+
+            if (tab === 'kitchen' || tab === 'cashier') {
+                loadOrders();
+            }
+        }
+
+        // Fetch Initial Data
+        async function initData() {
+            await Promise.all([loadTables(), loadProducts()]);
+        }
+
+        async function loadTables() {
+            try {
+                const res = await fetch(`${API_BASE}/orders/tables/list`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                allTables = data.data || [];
+                renderTables();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderTables() {
+            const container = document.getElementById('table-grid');
+            if (allTables.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 col-span-full">Chưa có bàn nào trong DB</p>';
+                return;
+            }
+            container.innerHTML = allTables.map(t => {
+                const isSelected = selectedTableId === t.id;
+                const isOccupied = t.status === 'occupied';
+                const bg = isSelected ? 'bg-emerald-600 text-white border-emerald-600' :
+                           isOccupied ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white hover:bg-emerald-50 text-gray-700 border-gray-200';
+                return `
+                    <button onclick="selectTable('${t.id}', '${t.table_number}')" class="p-3 border rounded-xl text-center transition flex flex-col items-center justify-center ${bg}">
+                        <i class="fa-solid fa-chair text-lg mb-1"></i>
+                        <span class="font-bold text-sm">Bàn ${t.table_number}</span>
+                        <span class="text-[10px] mt-0.5 opacity-80">${t.status}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectTable(id, num) {
+            selectedTableId = id;
+            document.getElementById('selected-table-badge').innerText = `Bàn ${num}`;
+            document.getElementById('selected-table-badge').className = "text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-bold";
+            renderTables();
+        }
+
+        async function loadProducts() {
+            try {
+                const res = await fetch(`${API_BASE}/products?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                allProducts = data.data || [];
+                renderProducts();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('product-grid');
+            if (allProducts.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 col-span-full">Chưa có sản phẩm nào</p>';
+                return;
+            }
+            container.innerHTML = allProducts.map(p => `
+                <div class="border rounded-xl p-3.5 hover:shadow-md transition flex flex-col justify-between bg-white">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-gray-800 text-sm">${p.name}</h4>
+                            <span class="text-xs px-2 py-0.5 rounded font-semibold ${p.quantity > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}">
+                                Còn: ${p.quantity}
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1 line-clamp-1">${p.description || ''}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-3 pt-2 border-t">
+                        <span class="font-bold text-emerald-600 text-sm">${p.price.toLocaleString('vi-VN')} đ</span>
+                        <button onclick="addToCart('${p.id}')" ${p.quantity <= 0 ? 'disabled' : ''} class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 text-white text-xs font-bold rounded-lg shadow-sm">
+                            + Thêm
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(productId) {
+            const p = allProducts.find(x => x.id === productId);
+            if (!p) return;
+            const existing = cart.find(x => x.product.id === productId);
+            if (existing) {
+                if (existing.quantity + 1 > p.quantity) {
+                    showToast(`Kho chỉ còn ${p.quantity} phần cho món này!`, true);
+                    return;
+                }
+                existing.quantity += 1;
+            } else {
+                cart.push({ product: p, quantity: 1 });
+            }
+            renderCart();
+        }
+
+        function updateCartQty(productId, delta) {
+            const item = cart.find(x => x.product.id === productId);
+            if (!item) return;
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                cart = cart.filter(x => x.product.id !== productId);
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-list');
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-400 text-center py-8">Chưa có món nào được chọn</p>';
+                document.getElementById('cart-total').innerText = '0 đ';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                const subtotal = item.product.price * item.quantity;
+                total += subtotal;
+                return `
+                    <div class="py-2 flex justify-between items-center text-xs">
+                        <div class="flex-1 pr-2">
+                            <p class="font-bold text-gray-800">${item.product.name}</p>
+                            <p class="text-gray-400">${item.product.price.toLocaleString('vi-VN')} đ</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateCartQty('${item.product.id}', -1)" class="w-6 h-6 bg-gray-100 rounded text-gray-600 hover:bg-gray-200 font-bold">-</button>
+                            <span class="font-bold">${item.quantity}</span>
+                            <button onclick="updateCartQty('${item.product.id}', 1)" class="w-6 h-6 bg-gray-100 rounded text-gray-600 hover:bg-gray-200 font-bold">+</button>
+                        </div>
+                        <div class="w-20 text-right font-bold text-gray-700">
+                            ${subtotal.toLocaleString('vi-VN')} đ
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cart-total').innerText = `${total.toLocaleString('vi-VN')} đ`;
+        }
+
+        // SUBMIT CREATE ORDER
+        async function submitCreateOrder() {
+            if (cart.length === 0) {
+                showToast('Vui lòng chọn ít nhất 1 món ăn!', true);
+                return;
+            }
+
+            const customerEmail = document.getElementById('order-customer-email').value;
+            const items = cart.map(x => ({
+                product_id: x.product.id,
+                quantity: x.quantity
+            }));
+
+            try {
+                const res = await fetch(`${API_BASE}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        table_id: selectedTableId || null,
+                        items: items,
+                        note: `Khách mail: ${customerEmail}`
+                    })
+                });
+
+                const data = await res.json();
+                if (data.error) {
+                    if (data.details && Array.isArray(data.details)) {
+                        const msgs = data.details.map(d => d.message).join('; ');
+                        throw new Error(`${data.message}: ${msgs}`);
+                    }
+                    throw new Error(data.message || data.details);
+                }
+
+                showToast(`✅ Tạo đơn #${data.data.id} thành công! Đã gửi vào bếp.`);
+                cart = [];
+                renderCart();
+                loadTables();
+                loadProducts();
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        }
+
+        // LOAD ORDERS FOR KITCHEN & CASHIER
+        async function loadOrders() {
+            try {
+                const res = await fetch(`${API_BASE}/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const orders = data.data || [];
+                renderKitchen(orders);
+                renderCashier(orders);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderKitchen(orders) {
+            const container = document.getElementById('kitchen-orders-container');
+            // Kitchen quan tâm các đơn: pending, cooking, ready
+            const kitchenOrders = orders.filter(o => ['pending', 'cooking', 'ready', 'served'].includes(o.status));
+
+            if (kitchenOrders.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-400 col-span-full py-8 text-center bg-white rounded-xl">Hiện không có đơn hàng nào cần bếp xử lý</p>';
+                return;
+            }
+
+            container.innerHTML = kitchenOrders.map(o => {
+                let badgeColor = o.status === 'pending' ? 'bg-amber-100 text-amber-800' :
+                                 o.status === 'cooking' ? 'bg-orange-100 text-orange-800' :
+                                 o.status === 'ready' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+                
+                return `
+                    <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-2 pb-2 border-b">
+                                <div>
+                                    <span class="font-bold text-gray-800">#${o.id.substring(0, 8)}...</span>
+                                    <span class="text-xs text-gray-500 ml-2">${o.table ? 'Bàn ' + o.table.table_number : 'Mang về'}</span>
+                                </div>
+                                <span class="text-xs px-2 py-0.5 rounded font-bold uppercase ${badgeColor}">${o.status}</span>
+                            </div>
+                            <ul class="text-xs space-y-1 my-2">
+                                ${o.items.map(it => `
+                                    <li class="flex justify-between">
+                                        <span class="font-medium text-gray-700">${it.product_name}</span>
+                                        <span class="font-bold">x${it.quantity}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="pt-3 border-t mt-3 flex space-x-2">
+                            ${o.status === 'pending' ? `
+                                <button onclick="changeStatus('${o.id}', 'cooking')" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-1.5 rounded text-xs">
+                                    <i class="fa-solid fa-fire mr-1"></i>Nhận Nấu
+                                </button>
+                            ` : ''}
+                            ${o.status === 'cooking' ? `
+                                <button onclick="changeStatus('${o.id}', 'ready')" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1.5 rounded text-xs">
+                                    <i class="fa-solid fa-bell mr-1"></i>Món Đã Xong
+                                </button>
+                            ` : ''}
+                            ${o.status === 'ready' ? `
+                                <button onclick="changeStatus('${o.id}', 'served')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded text-xs">
+                                    <i class="fa-solid fa-check mr-1"></i>Đã Mang Lên Bàn
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function changeStatus(orderID, new_status) {
+            try {
+                const res = await fetch(`${API_BASE}/orders/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ orderID, new_status })
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.message || data.details);
+                showToast(`Đã chuyển đơn sang: ${new_status.toUpperCase()}`);
+                loadOrders();
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        }
+
+        function renderCashier(orders) {
+            const container = document.getElementById('cashier-orders-container');
+            // Thu ngân hiển thị các đơn chưa hoàn tất (đặc biệt là served hoặc pending)
+            const unpaidOrders = orders.filter(o => o.status !== 'completed' && o.status !== 'cancelled');
+
+            if (unpaidOrders.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-400 col-span-full py-8 text-center bg-white rounded-xl">Không có hóa đơn nào cần thanh toán</p>';
+                return;
+            }
+
+            container.innerHTML = unpaidOrders.map(o => `
+                <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-2 pb-2 border-b">
+                            <div>
+                                <span class="font-bold text-gray-800">Đơn #${o.id.substring(0, 8)}...</span>
+                                <span class="text-xs bg-gray-100 px-2 py-0.5 rounded font-semibold ml-2">
+                                    ${o.table ? 'Bàn ' + o.table.table_number : 'Mang về'}
+                                </span>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600 uppercase">${o.status}</span>
+                        </div>
+                        <div class="text-xs space-y-1 my-2">
+                            ${o.items.map(it => `
+                                <div class="flex justify-between text-gray-600">
+                                    <span>${it.product_name} x${it.quantity}</span>
+                                    <span>${it.subtotal.toLocaleString('vi-VN')} đ</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t mt-3">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs text-gray-500">Cần thanh toán:</span>
+                            <span class="font-bold text-base text-red-600">${o.total_amount.toLocaleString('vi-VN')} đ</span>
+                        </div>
+                        <button onclick="payOrder('${o.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs shadow transition flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-receipt"></i>
+                            <span>Xác Nhận Đã Thanh Toán & Bắn Mail</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function payOrder(order_id) {
+            if (!confirm('Xác nhận khách đã thanh toán hóa đơn này?')) return;
+            try {
+                const res = await fetch(`${API_BASE}/payments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        order_id: order_id,
+                        payment_method: 'banking'
+                    })
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.message || data.details);
+
+                showToast('🎉 Thanh toán thành công! Đã giải phóng bàn & kích hoạt Kafka gửi mail hóa đơn.');
+                loadOrders();
+                loadTables();
+            } catch (err) {
+                showToast(err.message, true);
+            }
+        }
+    </script>
+</body>
+</html>
+
